@@ -3,6 +3,7 @@ package com.leadiq.controller;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Description;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,68 +13,49 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.leadiq.model.Transaction;
-import com.leadiq.model.TransactionStats;
+import com.leadiq.model.request.TransactionRequest;
 import com.leadiq.service.TransactionService;
 
 @RestController
-@Description("A controller for handling requests for hello messages")
+@Description("Controller for all transaction api requests")
 public class TransactionController {
-	
 	
 	@Autowired
 	TransactionService transactionService;
+	@Autowired
+	ApplicationContext applicationContext;
 
 
 	@RequestMapping(value = "/transactionservice/transaction/{transaction_id}", method = RequestMethod.PUT)
-	public @ResponseBody String putData(@PathVariable("transaction_id")int transactionId, @RequestBody Transaction transaction) {
+	public @ResponseBody Transaction addTransaction(@PathVariable("transaction_id")int transactionId, @RequestBody TransactionRequest transactionRequest) {
 		
-	System.out.println(transactionId);	
-	System.out.println(transaction);
-	
-	transaction.setId(transactionId);
-	
-	
-	transaction.setStats(new TransactionStats());
-	TransactionStats stats = transaction.getStats();
-	
-	System.out.println("stats = " + stats);
-	
-	stats.setSum(transaction.getAmount());
-	
-	transactionService.addTransaction(transaction);
-	
-	
-	return "ok";
+		Transaction transaction = applicationContext.getBean(Transaction.class);
 		
+		transaction.setId(transactionId);
+		transaction.setAmount(transactionRequest.getAmount());
+		transaction.setType(transactionRequest.getType());
+		transaction.setParent_id(transactionRequest.getParent_id());
+		
+		return transactionService.addTransaction(transaction);
+
 	}
 	
 	
 	@RequestMapping(value = "/transactionservice/transaction/{transaction_id}", method = RequestMethod.GET)
-	@ResponseBody
-	public Transaction hello1(@PathVariable("transaction_id")int transactionId) {
+	public @ResponseBody Transaction getTransaction(@PathVariable("transaction_id")int transactionId) {
 		return transactionService.getTransaction(transactionId);
-		
 	}
 	
 	
 	@RequestMapping(value = "/transactionservice/types/{type}", method = RequestMethod.GET)
-	@ResponseBody
-	public ArrayList<Integer> hello2(@PathVariable("type")String type) {
+	public @ResponseBody ArrayList<Integer> getTransactionsOfType(@PathVariable("type")String type) {
 		return transactionService.getTransactionsOfType(type);
 	}
 	
 	
 	@RequestMapping(value = "/transactionservice/sum/{transaction_id}", method = RequestMethod.GET)
-	@ResponseBody
-	public Integer hello3(@PathVariable("transaction_id")int transactionId) {
-		Transaction t = transactionService.getTransaction(transactionId);
-		
-		if(t!=null) {
-			return t.getStats().getSum();	
-		} else {
-			return 0;
-		}
-		
+	public @ResponseBody Integer getTransactionSum(@PathVariable("transaction_id")Integer transactionId) {
+		return transactionService.getTransactionSum(transactionId);
 	}
 	
 	
