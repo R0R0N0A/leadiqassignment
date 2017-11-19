@@ -3,6 +3,7 @@ package com.leadiq.database;
 import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Description;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +12,7 @@ import com.leadiq.model.Transaction;
 
 @Component
 @Scope("application")
+@Description("A simple class to store Transactions & TransactionTypeIndex ")
 public class InMemoryDatabase {
 
 	private HashMap<Integer, Transaction> transactions;

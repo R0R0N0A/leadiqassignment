@@ -14,6 +14,8 @@ public class Transaction {
 	private String type;
 	private Integer parent_id;
 	
+	// reference to the Transaction stats which stores 
+	// sum of all child transaction amounts of the current transaction + current transaction amount.
 	@Autowired
 	@JsonIgnore
 	private TransactionStats stats;

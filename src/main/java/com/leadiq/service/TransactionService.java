@@ -15,13 +15,29 @@ public class TransactionService {
 	@Autowired
 	InMemoryDatabaseService databaseService;
 	
-	public Transaction addTransaction(Transaction transaction) {
+	// using synchronized as the TransactionStats of a particular transaction & 
+	// InMemoryDatabase instance is shared across requests.
+	public synchronized Transaction addTransaction(Transaction transaction) {
 		
 		Integer id = transaction.getId();
 		
+		// checking if parent id is valid else it might result in a loop.
+		if(transaction.getParent_id()!=null) {
+			Transaction parentTransaction = databaseService.getTransaction(transaction.getParent_id());
+			
+			if(parentTransaction== null) {
+				System.out.println("Already Exists");
+				throw new IllegalArgumentException("Transaction with given parent id doesn't exist");
+			}
+			
+		}
+		
+		// checking if a transaction given id already exists
 		if(databaseService.containsTransaction(id)) {
+			
 			System.out.println("Already Exists");
 			throw new IllegalArgumentException("Transaction with given id already exists");
+			
 		} else {
 			
 			databaseService.addTransaction(transaction);

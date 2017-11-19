@@ -3,6 +3,7 @@ package com.leadiq.service;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Service;
 
 import com.leadiq.database.InMemoryDatabase;
@@ -10,6 +11,7 @@ import com.leadiq.model.Transaction;
 
 
 @Service
+@Description("A service to manage/crud on InMemoryDatabase")
 public class InMemoryDatabaseService {
 	
 	@Autowired
@@ -20,10 +22,11 @@ public class InMemoryDatabaseService {
 		return database.getTransactions().containsKey(transactionId);
 	}
 	
-	public void addTransaction(Transaction transaction) {
+	// using synchronized as the InMemoryDatabase instance is shared across requests.
+	public synchronized void addTransaction(Transaction transaction) {
 		database.getTransactions().put(transaction.getId(), transaction);
 		
-		// update the index
+		// update the index for transaction type
 		ArrayList<Integer> al = getTransactionIdsForType(transaction.getType());
 		if(al == null) {
 			al = new ArrayList<Integer>();
